@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-TOKEN = "EAAbxWhQZCN0cBRr8SdNEGqbiNsqvPkBrZC52aSz7ZBDNILvYjZAvJ0CZCDOZA71YgIHnphc2ssfgHso5o1NDagPYtGwghsSUGI2hpg3iY5HNxuMmTxxnZAs8WDZC4WYxgCUYiPhtifwE22o8F8ahkak6r0U0TFmiBgfxt2ktZAu8ZASCYG0l7TAh6wonhLomGH2PYvIPc3YLzLZACVetE8HFvQGyr2MnvcxaQb0LA94F0m7mbZCFIERATM0hwYmWynvs25xPr8DPGtWfsGHsSd40O1HOPTPe0wZDZD"
+TOKEN = "EAAbxWhQZCN0cBRoZBhlZCJxhZBnY9l5EP5M0CupEUTopxwFGtLcI65FQZAvdZAINDtVQkv7lfNfGaAinYL7qODToanHMcO3z9PYFSQbaPbNrrLsZAMnEPLhZB1SMv5naNzrLWNwZBLiT3Fj6pGfXPE0jXDfZBfpUdzRqq3fKkkhZAGrPVCvCCedeeQIRgZC0uxaiz56BOZARnI5TAOi504UOo2ZAZAZC1alqUJmOTjzFX8ecFDkmaTDZAyhOgXK9aeLw3A9fLZCG3JKxzteO5OTmUs4CFNccLqi9Ws"
 PHONE_NUMBER_ID = "1048936894977568"
 VERIFY_TOKEN = "roman123"
 
@@ -46,103 +46,78 @@ def recibir_mensaje():
 def responder(mensaje_cliente):
     mensaje = mensaje_cliente.lower()
 
-    if "hola" in mensaje or "buenas" in mensaje or "info" in mensaje or "información" in mensaje:
+    if "agendar" in mensaje or "cita" in mensaje or "demo" in mensaje or "reservar" in mensaje:
+        return (
+            "📅 Perfecto, podemos agendar una cita con Velnorix.\n\n"
+            "Por favor copia y llena estos datos:\n\n"
+            "👤 Nombre:\n"
+            "🏪 Tipo de negocio:\n"
+            "📲 Número de contacto:\n"
+            "📆 Día disponible:\n"
+            "🕘 Hora disponible:\n"
+            "💬 ¿Qué necesitas automatizar?:\n\n"
+            "Cuando nos envíes esos datos, un asesor de Velnorix revisará tu solicitud y te confirmará la cita."
+        )
+
+    elif "nombre:" in mensaje and "negocio:" in mensaje:
+        return (
+            "✅ Gracias. Hemos recibido tu solicitud de cita.\n\n"
+            "Un asesor de *Velnorix* revisará tus datos y se comunicará contigo para confirmar la demostración del chatbot 🤖"
+        )
+
+    elif "precio" in mensaje or "precios" in mensaje or "costo" in mensaje:
+        return (
+            "💰 *Precios de Velnorix:*\n\n"
+            "✅ Instalación: *$50*\n"
+            "✅ Mensualidad: *$30*\n\n"
+            "Incluye configuración inicial del chatbot, respuestas básicas y conexión con WhatsApp."
+        )
+
+    elif "horario" in mensaje:
+        return (
+            "🕘 *Horario de atención:*\n\n"
+            "Atendemos de *16:00 a 00:00*."
+        )
+
+    elif "ubicacion" in mensaje or "ubicación" in mensaje or "direccion" in mensaje:
+        return (
+            "📍 No tenemos local físico.\n\n"
+            "Trabajamos de forma directa con el cliente por WhatsApp, videollamada o atención a domicilio según el caso."
+        )
+
+    elif "servicio" in mensaje or "servicios" in mensaje or "chatbot" in mensaje:
+        return (
+            "🤖 *Servicios de Velnorix:*\n\n"
+            "✅ Chatbots para WhatsApp\n"
+            "✅ Respuestas automáticas 24/7\n"
+            "✅ Agendamiento manual de citas\n"
+            "✅ Información de precios, horarios y servicios\n"
+            "✅ Automatización para negocios pequeños\n\n"
+            "Ideal para barberías, tiendas, restaurantes, spas, gimnasios y emprendimientos."
+        )
+
+    elif "hola" in mensaje or "buenas" in mensaje:
         return (
             "👋 Hola, somos *Velnorix*.\n\n"
-            "Creamos chatbots para WhatsApp que ayudan a negocios a responder automáticamente a sus clientes.\n\n"
-            "Puedes escribir:\n"
+            "Creamos chatbots para WhatsApp que ayudan a los negocios a responder automáticamente.\n\n"
+            "Escribe una opción:\n\n"
             "💰 precios\n"
             "🤖 servicios\n"
             "📅 agendar\n"
             "🕘 horario\n"
-            "📍 ubicación\n"
-            "❓ cómo funciona"
-        )
-
-    elif "precio" in mensaje or "precios" in mensaje or "costo" in mensaje or "cuanto" in mensaje or "cuánto" in mensaje:
-        return (
-            "💰 *Precios de Velnorix:*\n\n"
-            "✅ Instalación del chatbot: *$50*\n"
-            "✅ Mensualidad: *$30*\n\n"
-            "La instalación incluye configuración inicial, respuestas básicas del negocio y conexión del bot."
-        )
-
-    elif "servicio" in mensaje or "servicios" in mensaje or "bot" in mensaje or "chatbot" in mensaje:
-        return (
-            "🤖 *Servicios de Velnorix:*\n\n"
-            "✅ Chatbot para WhatsApp\n"
-            "✅ Respuestas automáticas 24/7\n"
-            "✅ Información de precios, horarios y servicios\n"
-            "✅ Agendamiento de citas\n"
-            "✅ Atención inicial para clientes\n"
-            "✅ Personalización según tu negocio\n\n"
-            "Ideal para barberías, tiendas, restaurantes, spas, gimnasios y emprendimientos."
-        )
-
-    elif "horario" in mensaje or "atienden" in mensaje or "hora" in mensaje:
-        return (
-            "🕘 *Horario de atención Velnorix:*\n\n"
-            "Atendemos todos los días de *16:00 a 00:00*.\n\n"
-            "También puedes dejarnos tu mensaje y te responderemos apenas estemos disponibles."
-        )
-
-    elif "ubicacion" in mensaje or "ubicación" in mensaje or "direccion" in mensaje or "dirección" in mensaje:
-        return (
-            "📍 *Velnorix no tiene local físico.*\n\n"
-            "Trabajamos de manera directa con el cliente, por WhatsApp, videollamada o visita a domicilio según el caso."
-        )
-
-    elif "agendar" in mensaje or "cita" in mensaje or "reunion" in mensaje or "reunión" in mensaje or "reservar" in mensaje:
-        return (
-            "📅 Perfecto, podemos agendar una cita.\n\n"
-            "Por favor envíanos estos datos:\n\n"
-            "👤 Nombre:\n"
-            "🏪 Tipo de negocio:\n"
-            "📲 Número de WhatsApp del negocio:\n"
-            "📆 Día disponible:\n"
-            "🕘 Hora disponible:\n\n"
-            "Un asesor de Velnorix revisará tu solicitud y te confirmará la cita."
-        )
-
-    elif "como funciona" in mensaje or "cómo funciona" in mensaje or "funciona" in mensaje:
-        return (
-            "⚙️ *¿Cómo funciona el chatbot de Velnorix?*\n\n"
-            "1️⃣ El cliente escribe a tu WhatsApp.\n"
-            "2️⃣ El bot responde automáticamente.\n"
-            "3️⃣ Puede dar precios, horarios, servicios y agendar citas.\n"
-            "4️⃣ Si el cliente necesita atención humana, tú puedes continuar la conversación.\n\n"
-            "Así tu negocio no pierde clientes aunque estés ocupado."
-        )
-
-    elif "demo" in mensaje or "prueba" in mensaje:
-        return (
-            "🚀 Sí, podemos mostrarte una demo del chatbot.\n\n"
-            "Escríbenos:\n"
-            "👤 Tu nombre\n"
-            "🏪 Tu tipo de negocio\n"
-            "📆 Día y hora para la demostración\n\n"
-            "Y coordinamos contigo."
-        )
-
-    elif "gracias" in mensaje or "ok" in mensaje or "listo" in mensaje:
-        return (
-            "Con gusto 🙌\n\n"
-            "Velnorix está para ayudarte a automatizar la atención de tu negocio."
+            "📍 ubicación"
         )
 
     else:
         return (
-            "👋 Hola, soy el asistente virtual de *Velnorix* 🤖\n\n"
+            "👋 Soy el asistente virtual de *Velnorix* 🤖\n\n"
             "Puedo ayudarte con:\n\n"
             "💰 precios\n"
             "🤖 servicios\n"
             "📅 agendar una cita\n"
             "🕘 horario\n"
-            "📍 ubicación\n"
-            "⚙️ cómo funciona\n\n"
-            "Escribe una de esas opciones para continuar."
+            "📍 ubicación"
         )
-
 
 def enviar_mensaje(numero_cliente, respuesta_bot):
     url = f"https://graph.facebook.com/v25.0/{PHONE_NUMBER_ID}/messages"
