@@ -34,7 +34,7 @@ def recibir_mensaje():
         mensaje_cliente = data["entry"][0]["changes"][0]["value"]["messages"][0]["text"]["body"]
         numero_cliente = data["entry"][0]["changes"][0]["value"]["messages"][0]["from"]
 
-        respuesta_bot = responder(mensaje_cliente)
+        respuesta_bot = responder(mensaje_cliente, numero_cliente)
         enviar_mensaje(numero_cliente, respuesta_bot)
 
     except Exception as error:
@@ -42,82 +42,69 @@ def recibir_mensaje():
 
     return "ok", 200
 
-
-def responder(mensaje_cliente):
+def responder(mensaje_cliente, numero_cliente):
     mensaje = mensaje_cliente.lower()
 
-    if "agendar" in mensaje or "cita" in mensaje or "demo" in mensaje or "reservar" in mensaje:
-        return (
-            "📅 Perfecto, podemos agendar una cita con Velnorix.\n\n"
-            "Por favor copia y llena estos datos:\n\n"
-            "👤 Nombre:\n"
-            "🏪 Tipo de negocio:\n"
-            "📲 Número de contacto:\n"
-            "📆 Día disponible:\n"
-            "🕘 Hora disponible:\n"
-            "💬 ¿Qué necesitas automatizar?:\n\n"
-            "Cuando nos envíes esos datos, un asesor de Velnorix revisará tu solicitud y te confirmará la cita."
-        )
+    if numero_cliente in citas_pendientes:
+        paso = citas_pendientes[numero_cliente]["paso"]
 
-    elif "nombre:" in mensaje and "negocio:" in mensaje:
-        return (
-            "✅ Gracias. Hemos recibido tu solicitud de cita.\n\n"
-            "Un asesor de *Velnorix* revisará tus datos y se comunicará contigo para confirmar la demostración del chatbot 🤖"
-        )
+        if paso == "nombre":
+            citas_pendientes[numero_cliente]["nombre"] = mensaje_cliente
+            citas_pendientes[numero_cliente]["paso"] = "negocio"
+            return "🏪 Perfecto. ¿Cuál es el nombre de tu negocio?"
 
-    elif "precio" in mensaje or "precios" in mensaje or "costo" in mensaje:
-        return (
-            "💰 *Precios de Velnorix:*\n\n"
-            "✅ Instalación: *$50*\n"
-            "✅ Mensualidad: *$30*\n\n"
-            "Incluye configuración inicial del chatbot, respuestas básicas y conexión con WhatsApp."
-        )
+        elif paso == "negocio":
+            citas_pendientes[numero_cliente]["negocio"] = mensaje_cliente
+            citas_pendientes[numero_cliente]["paso"] = "numero"
+            return "📲 ¿Cuál es tu número de contacto?"
 
-    elif "horario" in mensaje:
-        return (
-            "🕘 *Horario de atención:*\n\n"
-            "Atendemos de *16:00 a 00:00*."
-        )
+        elif paso == "numero":
+            citas_pendientes[numero_cliente]["telefono"] = mensaje_cliente
+            citas_pendientes[numero_cliente]["paso"] = "dia"
+            return "📆 ¿Qué día deseas la cita?"
 
-    elif "ubicacion" in mensaje or "ubicación" in mensaje or "direccion" in mensaje:
-        return (
-            "📍 No tenemos local físico.\n\n"
-            "Trabajamos de forma directa con el cliente por WhatsApp, videollamada o atención a domicilio según el caso."
-        )
+        elif paso == "dia":
+            citas_pendientes[numero_cliente]["dia"] = mensaje_cliente
+            citas_pendientes[numero_cliente]["paso"] = "hora"
+            return "🕘 ¿A qué hora deseas la cita?"
 
-    elif "servicio" in mensaje or "servicios" in mensaje or "chatbot" in mensaje:
-        return (
-            "🤖 *Servicios de Velnorix:*\n\n"
-            "✅ Chatbots para WhatsApp\n"
-            "✅ Respuestas automáticas 24/7\n"
-            "✅ Agendamiento manual de citas\n"
-            "✅ Información de precios, horarios y servicios\n"
-            "✅ Automatización para negocios pequeños\n\n"
-            "Ideal para barberías, tiendas, restaurantes, spas, gimnasios y emprendimientos."
-        )
+        elif paso == "hora":
+            citas_pendientes[numero_cliente]["hora"] = mensaje_cliente
 
-    elif "hola" in mensaje or "buenas" in mensaje:
-        return (
-            "👋 Hola, somos *Velnorix*.\n\n"
-            "Creamos chatbots para WhatsApp que ayudan a los negocios a responder automáticamente.\n\n"
-            "Escribe una opción:\n\n"
-            "💰 precios\n"
-            "🤖 servicios\n"
-            "📅 agendar\n"
-            "🕘 horario\n"
-            "📍 ubicación"
-        )
+            datos = citas_pendientes[numero_cliente]
 
-    else:
-        return (
-            "👋 Soy el asistente virtual de *Velnorix* 🤖\n\n"
-            "Puedo ayudarte con:\n\n"
-            "💰 precios\n"
-            "🤖 servicios\n"
-            "📅 agendar una cita\n"
-            "🕘 horario\n"
-            "📍 ubicación"
-        )
+            mensaje_dueno = (
+                "📩 *NUEVA CITA VELNORIX*\n\n"
+                f"👤 Nombre: {datos['nombre']}\n"
+                f"🏪 Negocio: {datos['negocio']}\n"
+                f"📲 Número: {datos['telefono']}\n"
+                f"📆 Día: {datos['dia']}\n"
+                f"🕘 Hora: {datos['hora']}"
+            )
+
+            enviar_mensaje(NUMERO_DUENO, mensaje_dueno)
+
+            del citas_pendientes[numero_cliente]
+
+            return (
+                "✅ Gracias. Hemos recibido tu solicitud de cita.\n\n"
+                "Un asesor de *Velnorix* se comunicará contigo para confirmar la demostración del chatbot 🤖"
+            )
+
+    if "agendar" in mensaje or "cita" in mensaje or "demo" in mensaje:
+        citas_pendientes[numero_cliente] = {"paso": "nombre"}
+        return "📅 Perfecto, vamos a agendar tu cita. ¿Cuál es tu nombre?"
+
+    return (
+        "👋 Hola, soy el asistente virtual de *Velnorix* 🤖\n\n"
+        "Puedes escribir:\n"
+        "💰 precios\n"
+        "🤖 servicios\n"
+        "📅 agendar\n"
+        "🕘 horario\n"
+        "📍 ubicación"
+    )
+    
 
 def enviar_mensaje(numero_cliente, respuesta_bot):
     url = f"https://graph.facebook.com/v25.0/{PHONE_NUMBER_ID}/messages"
